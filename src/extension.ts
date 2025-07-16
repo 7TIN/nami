@@ -1,53 +1,81 @@
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
 
-// This is the main function that runs when your extension is activated.
-export function activate(context: vscode.ExtensionContext) {
+const COPY_PATH_COMMAND_ID = 'nami.copyFilePath';
 
-    console.log('Your "File Path Hint" extension is now active!');
+function formatPathForDisplay(relativePath: string): string {
+  const MAX_LENGTH = 80;
 
-    // Create a provider for our inlay hints.
-    const provider: vscode.InlayHintsProvider = {
-        
-        // This is the core function that provides the hints.
-        provideInlayHints(document, range) {
+  const normalized = relativePath.replace(/\\/g, "/");
+  const segments = normalized.split("/");
+  const originalSegments = [...segments];
+  if (segments.length === 0) return relativePath;
 
-            // Get the relative path of the current file.
-            // This makes the path shorter and more readable (e.g., src/app.ts instead of C:/Users/...)
-            const relativePath = vscode.workspace.asRelativePath(document.uri);
-            
-            // Define the position for the hint: line 0, character 0 (the very top).
-            const position = new vscode.Position(0, 0);
+  while (segments.length > 0) {
+    const candidate = segments.join("/");
 
-            // Create the inlay hint object.
-            const hint = new vscode.InlayHint(
-                position, // The position where the hint will be shown
-                `// ${relativePath}`, // The text that will be displayed
-                vscode.InlayHintKind.Parameter // The style of the hint
-            );
-            
-            // Add a helpful tooltip when the user hovers over the hint.
-            const markdownTooltip = new vscode.MarkdownString();
-            markdownTooltip.appendMarkdown(`**File Path:** \`${relativePath}\``);
-            markdownTooltip.appendMarkdown(`\n\nThis is a virtual hint provided by the extension and is not part of the actual file content.`);
-            hint.tooltip = markdownTooltip;
-            
-            // Add some padding to the left to make it look nice and align with code.
-            hint.paddingLeft = true;
+    // If it fits and the filename is fully visible, return it
+    if (candidate.length <= MAX_LENGTH) {
+      const filename = segments[segments.length - 1];
+      // Check if filename appears completely at the end
+      if (candidate.endsWith(filename)) {
+        const wasTrimmed = segments.length < originalSegments.length;
+        return wasTrimmed ? `.../${candidate}` : candidate;
+      }
+    }
 
-            // Return an array containing our single hint.
-            // VS Code will then render it in the editor.
-            return [hint];
-        }
-    };
+    // Remove one folder from the front and try again
+    segments.shift();
+  }
 
-    // Now, we register our provider.
-    // The selector { pattern: '**/*' } tells VS Code to run this for all files.
-    const disposable = vscode.languages.registerInlayHintsProvider({ pattern: '**/*' }, provider);
-
-    // Add the provider to the context's subscriptions.
-    // This ensures it's cleaned up properly when the extension is deactivated.
-    context.subscriptions.push(disposable);
+  // Fallback: return filename only
+  const filename = originalSegments[originalSegments.length - 1];
+  return `.../${filename}`;
 }
 
-// This function is called when your extension is deactivated.
+
+
+export function activate(context: vscode.ExtensionContext) {
+  console.log('File Path Hint extension is active.');
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(COPY_PATH_COMMAND_ID, (path: string) => {
+      vscode.env.clipboard.writeText(path);
+      vscode.window.showInformationMessage('Full file path copied!');
+    })
+  );
+
+  const provider: vscode.InlayHintsProvider = {
+    provideInlayHints(document) {
+      const absolutePath = document.uri.fsPath;
+      const relativePath = vscode.workspace.asRelativePath(absolutePath);
+      const displayPath = `// ${formatPathForDisplay(relativePath)}\n`;
+      const position = new vscode.Position(0, 0);
+
+      const command: vscode.Command = {
+        title: "Copy Full Path",
+        command: COPY_PATH_COMMAND_ID,
+        arguments: [absolutePath], 
+      };
+
+      const labelPart = new vscode.InlayHintLabelPart(displayPath);
+      labelPart.command = command; 
+
+      const hint = new vscode.InlayHint(position, [labelPart]);
+      hint.paddingLeft = true;
+      
+      const tooltip = new vscode.MarkdownString();
+      tooltip.isTrusted = true;
+      tooltip.appendMarkdown(`**Full Path:** \`${absolutePath}\``);
+      tooltip.appendMarkdown(`\n\n[Click to copy](command:${COPY_PATH_COMMAND_ID}?${encodeURIComponent(JSON.stringify([absolutePath]))})`);
+      hint.tooltip = tooltip;
+
+      return [hint];
+    },
+  };
+
+  context.subscriptions.push(
+    vscode.languages.registerInlayHintsProvider({ scheme: "file" }, provider)
+  );
+}
+
 export function deactivate() {}
