@@ -5,7 +5,7 @@
   "description": "Displays the current file path at the top of the editor and allows copying with Ctrl+Click",
   "icon": "logo.png",
   "publisher": "Prasad17",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/7TIN/nami.git"

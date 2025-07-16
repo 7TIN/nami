@@ -46,9 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
     provideInlayHints(document) {
       const absolutePath = document.uri.fsPath;
       const relativePath = vscode.workspace.asRelativePath(absolutePath);
-      const displayPath = `// ${formatPathForDisplay(relativePath)}
-
-`;
+      const displayPath = `// ${formatPathForDisplay(relativePath)}`;
       const position = new vscode.Position(0, 0);
 
       const command: vscode.Command = {
