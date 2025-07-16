@@ -10,8 +10,9 @@
     "Other"
   ],
   "activationEvents": [
-    "onStartupFinished"
-  ],
+  "onStartupFinished",
+  "onLanguage:*"
+],
   "main": "./dist/extension.js",
 
   "contributes": {

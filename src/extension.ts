@@ -3,36 +3,36 @@ import * as vscode from "vscode";
 const COPY_PATH_COMMAND_ID = 'nami.copyFilePath';
 
 function formatPathForDisplay(relativePath: string): string {
-  const MAX_LENGTH = 80;
-
   const normalized = relativePath.replace(/\\/g, "/");
+  const importantRoots = ["src", "app", "pages", "main", "lib", "components"];
+
   const segments = normalized.split("/");
-  const originalSegments = [...segments];
-  if (segments.length === 0) return relativePath;
+  const filename = segments[segments.length - 1];
 
-  while (segments.length > 0) {
-    const candidate = segments.join("/");
-
-    // If it fits and the filename is fully visible, return it
-    if (candidate.length <= MAX_LENGTH) {
-      const filename = segments[segments.length - 1];
-      // Check if filename appears completely at the end
-      if (candidate.endsWith(filename)) {
-        const wasTrimmed = segments.length < originalSegments.length;
-        return wasTrimmed ? `.../${candidate}` : candidate;
-      }
+  // Try to start from the first "important" project folder
+  let startIndex = 0;
+  for (const root of importantRoots) {
+    const idx = segments.indexOf(root);
+    if (idx !== -1) {
+      startIndex = idx;
+      break;
     }
-
-    // Remove one folder from the front and try again
-    segments.shift();
   }
 
-  // Fallback: return filename only
-  const filename = originalSegments[originalSegments.length - 1];
-  return `.../${filename}`;
+  let visibleSegments = segments.slice(startIndex);
+
+  // Ensure the last segment ends with the full filename
+  let rebuilt = visibleSegments.join("/");
+
+  // If it does not end with filename, remove from front until it does
+  while (!rebuilt.endsWith(filename) && visibleSegments.length > 1) {
+    visibleSegments.shift();
+    rebuilt = visibleSegments.join("/");
+  }
+
+  const wasTrimmed = startIndex > 0 || visibleSegments.length < segments.length;
+  return wasTrimmed ? `.../${rebuilt}` : rebuilt;
 }
-
-
 
 export function activate(context: vscode.ExtensionContext) {
   console.log('File Path Hint extension is active.');
@@ -40,7 +40,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand(COPY_PATH_COMMAND_ID, (path: string) => {
       vscode.env.clipboard.writeText(path);
-      vscode.window.showInformationMessage('Full file path copied!');
+      vscode.window.showInformationMessage('Path copied!');
     })
   );
 
@@ -48,26 +48,24 @@ export function activate(context: vscode.ExtensionContext) {
     provideInlayHints(document) {
       const absolutePath = document.uri.fsPath;
       const relativePath = vscode.workspace.asRelativePath(absolutePath);
-      const displayPath = `// ${formatPathForDisplay(relativePath)}\n`;
+      const displayPath = `// ${formatPathForDisplay(relativePath)}
+
+`;
       const position = new vscode.Position(0, 0);
 
       const command: vscode.Command = {
         title: "Copy Full Path",
         command: COPY_PATH_COMMAND_ID,
-        arguments: [absolutePath], 
+        arguments: [absolutePath],
       };
 
       const labelPart = new vscode.InlayHintLabelPart(displayPath);
-      labelPart.command = command; 
+      labelPart.command = command;
 
       const hint = new vscode.InlayHint(position, [labelPart]);
       hint.paddingLeft = true;
-      
-      const tooltip = new vscode.MarkdownString();
-      tooltip.isTrusted = true;
-      tooltip.appendMarkdown(`**Full Path:** \`${absolutePath}\``);
-      tooltip.appendMarkdown(`\n\n[Click to copy](command:${COPY_PATH_COMMAND_ID}?${encodeURIComponent(JSON.stringify([absolutePath]))})`);
-      hint.tooltip = tooltip;
+
+      // Removed tooltip to avoid showing dialog box on hover
 
       return [hint];
     },
