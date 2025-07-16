@@ -1,71 +1,41 @@
-# nami README
+# Nami Path Hint 📍
 
-This is the README for your extension "nami". After writing up a brief description, we recommend including the following sections.
+A simple, zero-configuration VS Code extension that adds a clickable file path hint at the top of your editor. Never lose track of which file you're in, especially in projects with deep folder structures.
 
-## Features
-
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
+![Nami Path Hint Demo](https://i.imgur.com/gI2F4d4.gif)
 
 ---
 
-## Following extension guidelines
+## Features
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+* **Always-Visible Path**: Displays an inlay hint with the file's path on the first line.
+* **Smart Truncation**: Intelligently shortens long paths by removing folders from the front, always keeping the full filename visible.
+* **Click to Copy**: Simply click the path hint to instantly copy the file's full absolute path to your clipboard.
+* **Detailed Tooltip**: Hover over the hint to see the full, untruncated path and a button to copy.
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+---
 
-## Working with Markdown
+## Requirements
 
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
+There are no external requirements or dependencies. Simply install and it works.
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
+---
 
-## For more information
+## Extension Settings
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+This extension does not contribute any VS Code settings through the settings UI. For customization of the path formatting, you can directly edit the constants at the top of the `formatPathForDisplay` function in the source code.
 
-**Enjoy!**
+---
+
+## Release Notes
+
+### 1.0.0
+
+Initial release of Nami Path Hint.
+* Added inlay hint for file paths.
+* Implemented smart path truncation.
+* Added click-to-copy functionality.
+
+---
+
+**Enjoy the extension!**

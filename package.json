@@ -1,8 +1,11 @@
 {
   "name": "nami",
-  "displayName": "Nami",
-  "description": "Displays the current file path at the top of the editor",
+  "displayName": "Nami - File Path Hint",
+  "description": "Displays the current file path at the top of the editor and copy by ctrl + click",
+  "icon": "logo.png",
+  "publisher": "Prasad17",
   "version": "0.0.1",
+  
   "engines": {
     "vscode": "^1.102.0"
   },
