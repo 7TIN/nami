@@ -1,3 +1,4 @@
+
 import * as vscode from "vscode";
 
 const COPY_PATH_COMMAND_ID = 'nami.copyFilePath';
@@ -9,7 +10,6 @@ function formatPathForDisplay(relativePath: string): string {
   const segments = normalized.split("/");
   const filename = segments[segments.length - 1];
 
-  // Try to start from the first "important" project folder
   let startIndex = 0;
   for (const root of importantRoots) {
     const idx = segments.indexOf(root);
@@ -21,10 +21,8 @@ function formatPathForDisplay(relativePath: string): string {
 
   let visibleSegments = segments.slice(startIndex);
 
-  // Ensure the last segment ends with the full filename
   let rebuilt = visibleSegments.join("/");
 
-  // If it does not end with filename, remove from front until it does
   while (!rebuilt.endsWith(filename) && visibleSegments.length > 1) {
     visibleSegments.shift();
     rebuilt = visibleSegments.join("/");

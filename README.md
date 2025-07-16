@@ -1,8 +1,9 @@
+
 # Nami Path Hint 📍
 
 A simple, zero-configuration VS Code extension that adds a clickable file path hint at the top of your editor. Never lose track of which file you're in, especially in projects with deep folder structures.
 
-![Nami Path Hint Demo](https://i.imgur.com/gI2F4d4.gif)
+![Nami Path Hint Demo](https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExY2Q4Yjk0NjExZ20wamR6dmY5aXFqbDYxOWdrNnZ1b2diZDQyM2t6NCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/DScjO8V2iTa8PUquXh/giphy.gif)
 
 ---
 
